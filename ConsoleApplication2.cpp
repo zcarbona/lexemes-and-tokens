@@ -93,7 +93,7 @@ Token nextToken() {
             string id(1, c);
             while (cin.get(c) && isalnum(c)) id += c;
             cin.unget();
-            if (id == "if" || id == "while" || id == "return" || id == "for" || id == "else")
+            if (id == "if" || id == "while" || id == "return" || id == "for")
                 return { TokenType::RESERVED_WORD, id };
             return { TokenType::IDENTIFIER, id };
         }
