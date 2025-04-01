@@ -15,8 +15,8 @@ enum class TokenType {
     STRING,     // 8
     RESERVED_WORD,    // 9
     END,        // 10
-    LE_comparizon, // 11
-    RE_comparizon, //12
+    L_comparizon, // 11
+    R_comparizon, //12
     L_BRACET, //13
     R_BRACET, //14
     L_PAREN, //15
@@ -24,7 +24,10 @@ enum class TokenType {
     L_BRACES, //17
     R_BRACES, //18
     SEMICOLON,//19
-    INVALID     // 20
+    assign_op,// 20
+    LE_comparizon, //21
+    RE_comparizon, //22
+    INVALID     // 21
 };
 
 class Token {
@@ -55,10 +58,21 @@ Token nextToken() {
         while (cin.get(c) && c != '"') str += c;
         return { TokenType::STRING, str };
     }
-    case '<':
-        return { TokenType::LE_comparizon, string(1,c) };
-    case '>':
-        return { TokenType::RE_comparizon, string(1, c) };
+    case '<': {
+        if (cin.peek() == '=') {
+            cin.get();
+            return { TokenType::LE_comparizon, "<=" };
+        }
+        return { TokenType::L_comparizon, "<" };
+    }
+    case '>': {
+        if (cin.peek() == '=') { 
+            cin.get();
+            return { TokenType::RE_comparizon, ">=" };
+        }
+        return { TokenType::R_comparizon, ">" };
+    }
+    
     case '[':
         return{ TokenType::L_BRACET, string(1,c) };
     case ']':
@@ -73,6 +87,8 @@ Token nextToken() {
         return{ TokenType::R_PAREN,string(1,c) };
     case '^':
         return{ TokenType::EXP_OP,string(1,c) };
+    case '=':
+        return {TokenType::assign_op,string(1,c)};
     default:
         if (isdigit(c)) {
             string num(1, c);
