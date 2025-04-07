@@ -4,9 +4,9 @@ using namespace std;
 
 // Token types
 enum class TokenType {
-    IDENTIFIER, // 0
-    INT_LETRAL, // 1
-    FLOAT_LETRAL, // 2
+    variable, // 0
+    integer, // 1
+    pointed_number, // 2
     PLUSE_OP, // 3
     SUB_OP, // 4
     DIV_OP, // 5
@@ -16,7 +16,7 @@ enum class TokenType {
     RESERVED_WORD, // 9
     END, // 10
     L_comparizon, // 11
-    R_comparizon, // 12
+    G_comparizon, // 12
     L_BRACET, // 13
     R_BRACET, // 14
     L_PAREN, // 15
@@ -26,11 +26,11 @@ enum class TokenType {
     SEMICOLON, // 19
     assign_op, // 20
     LE_comparizon, // 21
-    RE_comparizon, // 22
-    IF, // 23
-    FOR, // 24
-    WHILE, // 25
-    INVALID // 26
+    GE_comparizon, // 22
+    IF_condition, // 23
+    FOR_loop, // 24
+    WHILE_loop, // 25
+    not_foud // 26
 };
 
 class Token {
@@ -39,11 +39,11 @@ public:
     string value;
 };
 
-string tokenTypeToString(TokenType type) {
+string SwitchingToWord(TokenType type) {
     switch (type) {
-    case TokenType::IDENTIFIER: return "IDENTIFIER";
-    case TokenType::INT_LETRAL: return "INT_LITERAL";
-    case TokenType::FLOAT_LETRAL: return "FLOAT_LITERAL";
+    case TokenType::variable: return "variable";
+    case TokenType::integer: return "integer_number";
+    case TokenType::pointed_number: return "pointed_number";
     case TokenType::PLUSE_OP: return "PLUS_OP";
     case TokenType::SUB_OP: return "SUB_OP";
     case TokenType::MULTI_OP: return "MULTI_OP";
@@ -53,9 +53,9 @@ string tokenTypeToString(TokenType type) {
     case TokenType::RESERVED_WORD: return "RESERVED_WORD";
     case TokenType::END: return "END";
     case TokenType::L_comparizon: return "L_COMPARISON";
-    case TokenType::R_comparizon: return "R_COMPARISON";
+    case TokenType::G_comparizon: return "G_COMPARISON";
     case TokenType::LE_comparizon: return "LE_COMPARISON";
-    case TokenType::RE_comparizon: return "RE_COMPARISON";
+    case TokenType::GE_comparizon: return "GE_COMPARISON";
     case TokenType::L_BRACET: return "L_BRACKET";
     case TokenType::R_BRACET: return "R_BRACKET";
     case TokenType::L_PAREN: return "L_PAREN";
@@ -64,10 +64,10 @@ string tokenTypeToString(TokenType type) {
     case TokenType::R_BRACES: return "R_BRACES";
     case TokenType::SEMICOLON: return "SEMICOLON";
     case TokenType::assign_op: return "ASSIGN_OP";
-    case TokenType::IF: return "IF";
-    case TokenType::FOR: return "FOR";
-    case TokenType::WHILE: return "WHILE";
-    case TokenType::INVALID: return "INVALID";
+    case TokenType::IF_condition: return "if condition";
+    case TokenType::FOR_loop: return "for loop";
+    case TokenType::WHILE_loop: return "while loop";
+    case TokenType::not_foud: return "not found";
     default: return "UNKNOWN";
     }
 }
@@ -104,9 +104,9 @@ Token nextToken() {
     case '>': {
         if (cin.peek() == '=') {
             cin.get();
-            return { TokenType::RE_comparizon, ">=" };
+            return { TokenType::GE_comparizon, ">=" };
         }
-        return { TokenType::R_comparizon, ">" };
+        return { TokenType::G_comparizon, ">" };
     }
     case '[':
         return { TokenType::L_BRACET, string(1, c) };
@@ -138,26 +138,31 @@ Token nextToken() {
             }
             cin.unget();
 
-            return { hasDot ? TokenType::FLOAT_LETRAL : TokenType::INT_LETRAL, num };
+            if (hasDot) {
+                return { TokenType::pointed_number, num };
+            }
+            else {
+                return { TokenType::integer, num };
+            }
         }
         else if (isalpha(c)) {
             string id(1, c);
             while (cin.get(c) && isalnum(c)) id += c;
             cin.unget();
-            if (id == "float" || id == "int")
+            if (id == "float" || id == "int" || id=="string" || id=="auto" || id=="char")
                 return { TokenType::RESERVED_WORD, id };
             else if (id == "while")
-                return { TokenType::WHILE, id };
+                return { TokenType::WHILE_loop, id };
             else if (id == "for")
-                return { TokenType::FOR, id };
+                return { TokenType::FOR_loop, id };
             else if (id == "if")
-                return { TokenType::IF, id };
+                return { TokenType::IF_condition, id };
             else {
-                return{ TokenType::IDENTIFIER,id};
+                return{ TokenType::variable,id };
             }
         }
         else {
-            return { TokenType::INVALID, string(1, c) };
+            return { TokenType::not_foud, string(1, c) };
         }
     }
 }
@@ -167,7 +172,7 @@ int main() {
 
     while (true) {
         Token token = nextToken();
-        cout << "Token(" << token.value << ", " << tokenTypeToString(token.type) << ")\n";
+        cout << "Token(" << token.value << ", " << SwitchingToWord(token.type) << ")\n";
         if (token.type == TokenType::END) break;
     }
 
